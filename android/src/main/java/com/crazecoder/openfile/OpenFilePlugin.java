@@ -96,27 +96,35 @@ public class OpenFilePlugin implements MethodCallHandler
             } else {
                 typeString = getFileType(filePath);
             }
-            if (pathRequiresPermission()) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if(!isFileAvailable()){
-                        return;
-                    }
-                    if (!isMediaStorePath()&&!Environment.isExternalStorageManager()) {
-                        result(-3, "Permission denied: android.Manifest.permission.MANAGE_EXTERNAL_STORAGE");
-                        return;
-                    }
+            if (Build.VERSION.SDK_INT >= 33) {
+                if (TYPE_STRING_APK.equals(typeString)) {
+                    openApkFile();
+                    return;
                 }
-                if (hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    if (TYPE_STRING_APK.equals(typeString)) {
-                        openApkFile();
-                        return;
-                    }
-                    startActivity();
-                } else {
-                    ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
-                }
-            } else {
                 startActivity();
+            } else { 
+                if (pathRequiresPermission()) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        if(!isFileAvailable()){
+                            return;
+                        }
+                        if (!isMediaStorePath()&&!Environment.isExternalStorageManager()) {
+                            result(-3, "Permission denied: android.Manifest.permission.MANAGE_EXTERNAL_STORAGE");
+                            return;
+                        }
+                    }
+                    if (hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                        if (TYPE_STRING_APK.equals(typeString)) {
+                            openApkFile();
+                            return;
+                        }
+                        startActivity();
+                    } else {
+                        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE);
+                    }
+                } else {
+                    startActivity();
+                }
             }
         } else {
             result.notImplemented();
