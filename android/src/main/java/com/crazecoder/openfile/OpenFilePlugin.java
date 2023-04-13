@@ -96,6 +96,7 @@ public class OpenFilePlugin implements MethodCallHandler
             } else {
                 typeString = getFileType(filePath);
             }
+            System.out.println(Build.VERSION.SDK_INT);
             if (Build.VERSION.SDK_INT >= 33) {
                 if (TYPE_STRING_APK.equals(typeString)) {
                     openApkFile();
